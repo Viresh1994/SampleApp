@@ -25,4 +25,4 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t myapp:${VERSION }.
+          docker build -t myapp:${VERSION} .
