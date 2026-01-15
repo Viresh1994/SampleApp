@@ -1,13 +1,14 @@
-name: Build Image on Tag
+name: Build Image on Release
 
-# on:
-#   push:
-#     tags:
-#       - v*
 on:
   release:
     types: [published]
+
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version to build (example: 1.2.0)"
+        required: true
 
 jobs:
   release:
@@ -17,11 +18,24 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
-        id: vars
+      - name: Resolve version
+        shell: bash
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "Triggered by release event"
+          else
+            VERSION="${{ inputs.version }}"
+            echo "Triggered manually"
+          fi
+
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: Version is empty"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
 
       - name: Build Docker image
         run: |
