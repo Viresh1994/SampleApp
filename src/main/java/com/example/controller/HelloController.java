@@ -9,4 +9,9 @@ public class HelloController {
     public String index() {
         return "Hello World!";
     }
+
+    @GetMapping("/api/hello")
+    public String index() {
+        return "Hello Java!";
+    }
 }
