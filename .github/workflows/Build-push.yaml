@@ -1,9 +1,13 @@
 name: Build Image on Tag
 
+# on:
+#   push:
+#     tags:
+#       - v*
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types: [published]
+
 
 jobs:
   release:
