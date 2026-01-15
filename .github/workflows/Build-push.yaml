@@ -1,0 +1,24 @@
+name: Build Image on Tag
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: vars
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t myapp:${{ steps.vars.outputs.version }} .
