@@ -4,9 +4,11 @@
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     "@semantic-release/github",
-    ["@semantic-release/exec", {
-      "successCmd": "gh workflow run build-image.yml --ref ${nextRelease.gitTag}"
-    }]
+    [
+      "@semantic-release/exec",
+      {
+        "successCmd": "gh workflow run build-image.yml --ref ${nextRelease.gitTag}"
+      }
+    ]
   ]
 }
-

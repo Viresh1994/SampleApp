@@ -1,25 +1,28 @@
-name: Build Image on Tag
+name: Build Image
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout source at tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
-      - name: Extract version from tag
+      - name: Resolve version
         shell: bash
         run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
+          VERSION="${GITHUB_REF#refs/tags/}"
 
           if [ -z "$VERSION" ]; then
-            echo "ERROR: Version is empty"
+            echo "ERROR: Version not found"
             exit 1
           fi
 
