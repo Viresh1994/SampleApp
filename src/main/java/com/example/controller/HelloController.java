@@ -14,4 +14,9 @@ public class HelloController {
     public String helo() {
         return "Hello Java!";
     }
+
+    @GetMapping("/api/hello")
+    public String home() {
+        return "Hello Java Home!";
+    }
 }
