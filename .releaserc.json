@@ -7,7 +7,7 @@
     [
       "@semantic-release/exec",
       {
-        "successCmd": "gh workflow run Build-push.yml --ref ${nextRelease.gitTag}"
+        "successCmd": "gh workflow run Build-push.yaml --ref ${nextRelease.gitTag}"
       }
     ]
   ]
