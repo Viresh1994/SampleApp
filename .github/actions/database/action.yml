@@ -1,0 +1,52 @@
+name: deploy/azure/database
+description: Bootstrap DAMS database security
+
+inputs:
+  database-name:
+    description: "Postgres server name (without .postgres.database.azure.com)"
+    required: true
+
+  opsconfigid:
+    description: "Logical database name suffix (e.g., dams -> azdams)"
+    required: true
+
+  postgres-admin:
+    description: "AAD admin user or SPN UPN for Postgres (bootstrap identity)"
+    required: true
+
+  grant-all-to:
+    description: "List of AAD users/groups to create (newline separated)"
+    required: true
+
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Set PG Parameters
+      shell: bash
+      run: |
+        echo "PGSSLMODE=require" >> "$GITHUB_ENV"
+        echo "PGHOST=${{ inputs.database-name }}.postgres.database.azure.com" >> "$GITHUB_ENV"
+        echo "PGDATABASE=az${{ inputs.opsconfigid }}" >> "$GITHUB_ENV"
+        echo "PGUSER=${{ inputs.postgres-admin }}" >> "$GITHUB_ENV"
+
+    - name: Bootstrap DAMS security
+      shell: bash
+      run: |
+        export PGPASSWORD="$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)"
+
+        # Create users
+        echo "${{ inputs.grant-all-to }}" | while IFS= read -r user || [[ -n "$user" ]]; do
+          user=$(echo "$user" | tr -d '\r' | xargs)
+          if [[ -n "$user" ]]; then
+            export username="$user"
+            cat ${GITHUB_ACTION_PATH}/postgres/create-user.sql | envsubst | PGDATABASE=postgres psql -v ON_ERROR_STOP=1
+          fi
+        done
+
+        # Create schema
+        psql -f ${GITHUB_ACTION_PATH}/postgres/create-schema.sql -v ON_ERROR_STOP=1
+
+        # Grant permissions
+        psql -f ${GITHUB_ACTION_PATH}/postgres/grant-schema.sql -v ON_ERROR_STOP=1
