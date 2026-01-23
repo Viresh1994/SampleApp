@@ -1,0 +1,29 @@
+name: DAMS DB Migrate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_RUNTIME }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run migrations
+        shell: bash
+        run: |
+          export PGHOST=YOUR_PG_SERVER.postgres.database.azure.com
+          export PGDATABASE=azdams
+          export PGUSER="dams-writer@YOURTENANT.onmicrosoft.com"
+          export PGSSLMODE=require
+          export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+
+          psql -f .github/actions/deploy/azure/database/postgres/tables.sql
+          psql -f .github/actions/deploy/azure/database/postgres/views.sql
