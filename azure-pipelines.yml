@@ -1,0 +1,35 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- main
+
+pool:
+  name: Default
+
+jobs:
+- job: Build
+  workspace:
+    clean: all
+
+  steps:
+  - checkout: self
+    clean: true
+
+  - script: |
+      echo "Branch: $(Build.SourceBranch)"
+      ls -la
+    displayName: "Verify Repo Checkout"
+
+  - script: |
+      mvn clean verify
+    displayName: "Build & Test"
+
+  - script: |
+      echo "Branch: $(Build.SourceBranch)"
+      git log -1
+      echo "---- POM VERSION ----"
+      grep -n jacoco pom.xml || echo "No jacoco found"
+    displayName: "Debug Repo State"
