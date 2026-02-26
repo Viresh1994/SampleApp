@@ -27,11 +27,11 @@ jobs:
       mvn clean verify
     displayName: "Build & Test"
     
-  - task: PublishCodeCoverageResults@1
+  - task: PublishCodeCoverageResults@2
     inputs:
-      codeCoverageTool: 'JaCoCo'
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco'
+      pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java'
+      failIfCoverageEmpty: true
 
   - script: |
       echo "Branch: $(Build.SourceBranch)"
