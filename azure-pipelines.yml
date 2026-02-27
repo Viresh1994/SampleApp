@@ -62,6 +62,7 @@ stages:
         downloadPath: '$(Build.SourcesDirectory)'
 
     - script: |
+        echo "Files in source directory:"
         ls -la
       displayName: "Verify WAR exists"
 
@@ -73,6 +74,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           $(Build.BuildId)
+          latest
 
 
 - stage: Deploy
@@ -93,4 +95,4 @@ stages:
           k8s/deployment.yaml
           k8s/service.yaml
         containers: |
-          demoregistry12345.azurecr.io/demo:$(Build.BuildId)
+          demoregistry12345.azurecr.io/demo:latest
