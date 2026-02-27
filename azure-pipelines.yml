@@ -73,3 +73,24 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           $(Build.BuildId)
+
+
+- stage: Deploy
+  displayName: "Deploy to AKS"
+  dependsOn: Docker
+  condition: succeeded()
+
+  jobs:
+  - job: DeployJob
+    steps:
+
+    - task: KubernetesManifest@1
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: 'aks-demo-connection'
+        namespace: default
+        manifests: |
+          k8s/deployment.yaml
+          k8s/service.yaml
+        containers: |
+          demoregistry12345.azurecr.io/demo:$(Build.BuildId)
