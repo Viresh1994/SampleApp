@@ -16,4 +16,4 @@ spec:
       - name: demo
         image: acrdemoimage.azurecr.io/demo:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 9090
