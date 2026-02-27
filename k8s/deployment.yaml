@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: demo
-        image: demoregistry12345.azurecr.io/demo:latest
+        image: acrdemoimage.azurecr.io/demo:latest
         ports:
         - containerPort: 8080
