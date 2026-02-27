@@ -46,11 +46,14 @@ stages:
         ArtifactName: 'drop'
 
 - stage: Docker
+  displayName: "Build & Push Docker Image"
   dependsOn: Build
   condition: succeeded()
+
   jobs:
   - job: DockerJob
     steps:
+
     - task: DownloadBuildArtifacts@0
       inputs:
         buildType: 'current'
@@ -59,4 +62,14 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
 
     - script: |
-        ls $(System.ArtifactsDirectory)/drop
+        ls -la $(System.ArtifactsDirectory)/drop
+      displayName: "Verify Artifact"
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr-docker-connection'
+        repository: 'demo'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.BuildId)
