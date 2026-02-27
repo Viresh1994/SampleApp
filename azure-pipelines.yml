@@ -24,7 +24,7 @@ jobs:
     displayName: "Verify Repo Checkout"
 
   - script: |
-      mvn clean verify sonar:sonar \
+      mvn clean verify sonar:sonar -Dsonar.qualitygate.wait=true \
         -Dsonar.host.url=http://localhost:9000 \
         -Dsonar.login=$(SONAR_TOKEN)
     displayName: "Build, Test & Sonar"
