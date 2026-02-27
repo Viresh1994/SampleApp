@@ -40,17 +40,23 @@ stages:
         pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java'
         failIfCoverageEmpty: true
 
-  # =========================
-  # STAGE 2 - PUBLISH ARTIFACT
-  # =========================
-- stage: Publish
-  displayName: "Publish Build Artifact"
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
+        ArtifactName: 'drop'
+
+- stage: Docker
   dependsOn: Build
   condition: succeeded()
   jobs:
-    - job: PublishJob
-      steps:
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: 'target/demo-0.0.1-SNAPSHOT.war'
-          ArtifactName: 'drop'
+  - job: DockerJob
+    steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    - script: |
+        ls $(System.ArtifactsDirectory)/drop
