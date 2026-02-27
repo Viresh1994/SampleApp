@@ -83,7 +83,7 @@ stages:
   jobs:
   - job: DeployJob
     steps:
-
+    - checkout: self
     - task: KubernetesManifest@1
       inputs:
         action: deploy
