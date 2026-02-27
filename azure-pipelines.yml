@@ -8,29 +8,49 @@ trigger:
 
 pool:
   name: Default
+stages:
 
-jobs:
-- job: Build
-  workspace:
-    clean: all
+# =========================
+# STAGE 1 - BUILD & QUALITY
+# =========================
+- stage: Build
+  jobs:
+  - job: BuildJob
+    workspace:
+      clean: all
 
-  steps:
-  - checkout: self
-    clean: true
+    steps:
+    - checkout: self
+      clean: true
 
-  - script: |
-      echo "Branch: $(Build.SourceBranch)"
-      ls -la
-    displayName: "Verify Repo Checkout"
+    - script: |
+        echo "Branch: $(Build.SourceBranch)"
+        ls -la
+      displayName: "Verify Repo Checkout"
 
-  - script: |
-      mvn clean verify sonar:sonar -Dsonar.qualitygate.wait=true \
-        -Dsonar.host.url=http://localhost:9000 \
-        -Dsonar.login=$(SONAR_TOKEN)
-    displayName: "Build, Test & Sonar"
+    - script: |
+        mvn clean verify sonar:sonar -Dsonar.qualitygate.wait=true \
+          -Dsonar.host.url=http://localhost:9000 \
+          -Dsonar.login=$(SONAR_TOKEN)
+      displayName: "Build, Test & Sonar"
 
-  - task: PublishCodeCoverageResults@2
-    inputs:
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
-      pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java'
-      failIfCoverageEmpty: true
+    - task: PublishCodeCoverageResults@2
+      inputs:
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
+        pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java'
+        failIfCoverageEmpty: true
+
+  # =========================
+  # STAGE 2 - PUBLISH ARTIFACT
+  # =========================
+- stage: Publish
+  displayName: "Publish Build Artifact"
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+    - job: PublishJob
+      steps:
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'target/demo-0.0.1-SNAPSHOT.war'
+          ArtifactName: 'drop'
