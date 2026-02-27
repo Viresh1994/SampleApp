@@ -59,11 +59,11 @@ stages:
         buildType: 'current'
         downloadType: 'single'
         artifactName: 'drop'
-        downloadPath: '$(System.ArtifactsDirectory)'
+        downloadPath: '$(Build.SourcesDirectory)'
 
     - script: |
-        ls -la $(System.ArtifactsDirectory)/drop
-      displayName: "Verify Artifact"
+        ls -la
+      displayName: "Verify WAR exists"
 
     - task: Docker@2
       inputs:
