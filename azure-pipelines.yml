@@ -95,4 +95,4 @@ stages:
           k8s/deployment.yaml
           k8s/service.yaml
         containers: |
-          demoregistry12345.azurecr.io/demo:latest
+          acrdemoimage.azurecr.io/demo:latest
