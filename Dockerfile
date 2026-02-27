@@ -12,6 +12,8 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.war app.war
 
+EXPOSE 9090
+
 ENTRYPOINT ["java", "-jar", "app.war"]
 # FROM eclipse-temurin:21-jre
 
